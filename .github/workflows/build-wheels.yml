@@ -27,7 +27,7 @@ jobs:
       # Install native dependencies
       - name: Install native dependencies
         run: |
-          brew install -y mongo-c-driver libpng libzip libtiff zlib tesseract poppler
+          brew install mongo-c-driver libpng libzip libtiff zlib tesseract poppler
           brewPackages = $(brew list)
           echo "$brewPackages"
 
