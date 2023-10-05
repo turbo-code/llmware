@@ -18,13 +18,6 @@ jobs:
       - name: Checkout native code
         uses: actions/checkout@v3
     
-      # Checkout llmware
-      - name: Checkout llmware
-        uses: actions/checkout@v3
-        with:
-          repository: llmware-ai/llmware
-        # path: optional-directory 
-
       # Setup Python 3.9
       - name: Setup Python 3.9
         uses: actions/setup-python@v3
