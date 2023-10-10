@@ -24,13 +24,22 @@ jobs:
         with:
           python-version: 3.9
 
-      # Install native dependencies
+      # Install Linux native dependencies
       - name: Install native dependencies
+        if: runner.os == 'Linux'
+        run: |
+          apt update && apt install -y gcc libxml2 libpng-dev libmongoc-dev libzip4
+          brewPackages = $(brew list)
+          echo "$brewPackages"
+
+      # Install Mac native dependencies
+      - name: Install native dependencies
+        if: runner.os == 'MacOS'
         run: |
           brew install mongo-c-driver libpng libzip libtiff zlib
           brewPackages = $(brew list)
           echo "$brewPackages"
-      
+
       - name: Install cibuildwheel
         run: python -m pip install cibuildwheel==2.16.2
 
