@@ -7,11 +7,11 @@ on:
 
 jobs:
   build_wheels:
-    name: Build wheel for macosx-arm64
-    runs-on: macos-latest
-
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
+      matrix:
+        os: [ubuntu-20.04, macos-11]
       
     steps:
       # Checkout the native code
@@ -27,17 +27,23 @@ jobs:
       # Install native dependencies
       - name: Install native dependencies
         run: |
-          brew install mongo-c-driver libpng libzip libtiff zlib tesseract poppler
+          brew install mongo-c-driver libpng libzip libtiff zlib
           brewPackages = $(brew list)
           echo "$brewPackages"
+      
+      - name: Install cibuildwheel
+        run: python -m pip install cibuildwheel==2.16.2
 
-      # - name: Build wheels
-      #   uses: pypa/cibuildwheel@v2.15.0
-      #   env:
-      #     CIBW_BUILD: ${{ matrix.python[0] }}-${{ matrix.buildplat[1] }}*
-      #     CIBW_ARCHS: ${{ matrix.buildplat[2] }}
-      #     CIBW_ENVIRONMENT_PASS_LINUX: RUNNER_OS
-      #     CIBW_PRERELEASE_PYTHONS: True
+      - name: Build wheels
+        run: python -m cibuildwheel --output-dir wheelhouse
+        # to supply options, put them in 'env', like:
+        # env:
+        #   CIBW_SOME_OPTION: value
+
+      - name: Upload artifcacts
+        uses: actions/upload-artifact@v3
+        with:
+          path: ./wheelhouse/*.whl
 
       #     # TODO remove the CIBW_BEFORE_BUILD_* lines once there are
       #     #  numpy2.0 wheels available on PyPI. Also remove/comment out the
