@@ -18,6 +18,8 @@ native_graph = Extension(
     libraries=['mongoc-1.0', 'bson-1.0', 'xml2', 'png', 'zip', 'poppler', 'tesseract'],
     include_dirs=['/opt/homebrew/Cellar/mongo-c-driver/1.24.4/include/libbson-1.0',
                   '/opt/homebrew/Cellar/mongo-c-driver/1.24.4/include/libmongoc-1.0',
+                  '/usr/local/Cellar/mongo-c-driver/1.24.4/include/libbson-1.0',
+                  '/usr/local/Cellar/mongo-c-driver/1.24.4/include/libmongoc-1.0',
                   '/usr/include/libbson-1.0/',
                   '/usr/include/libmongoc-1.0'],
     library_dirs=['/usr/local/lib']
@@ -28,6 +30,8 @@ native_pdf = Extension(
     libraries=['mongoc-1.0', 'bson-1.0', 'xml2', 'png', 'zip', 'poppler', 'tesseract'],
     include_dirs=['/opt/homebrew/Cellar/mongo-c-driver/1.24.4/include/libbson-1.0',
                   '/opt/homebrew/Cellar/mongo-c-driver/1.24.4/include/libmongoc-1.0',
+                  '/usr/local/Cellar/mongo-c-driver/1.24.4/include/libbson-1.0',
+                  '/usr/local/Cellar/mongo-c-driver/1.24.4/include/libmongoc-1.0',
                   '/usr/include/libbson-1.0/',
                   '/usr/include/libmongoc-1.0'],
     library_dirs=['/usr/local/lib']
@@ -38,6 +42,8 @@ native_office = Extension(
     libraries=['mongoc-1.0', 'bson-1.0', 'xml2', 'png', 'zip', 'poppler', 'tesseract'],
     include_dirs=['/opt/homebrew/Cellar/mongo-c-driver/1.24.4/include/libbson-1.0',
                   '/opt/homebrew/Cellar/mongo-c-driver/1.24.4/include/libmongoc-1.0',
+                  '/usr/local/Cellar/mongo-c-driver/1.24.4/include/libbson-1.0',
+                  '/usr/local/Cellar/mongo-c-driver/1.24.4/include/libmongoc-1.0',
                   '/usr/include/libbson-1.0/',
                   '/usr/include/libmongoc-1.0'],
     library_dirs=['/usr/local/lib']
