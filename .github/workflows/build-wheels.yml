@@ -22,18 +22,18 @@ jobs:
         with:
           python-version: 3.9
      
-          # Install Linux native dependencies
-      - name: Install native dependencies
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update && sudo apt-get install -y gcc libxml2 libpng-dev libmongoc-dev libzip4
+      #     # Install Linux native dependencies
+      # - name: Install native dependencies
+      #   if: runner.os == 'Linux'
+      #   run: |
+      #     sudo apt-get update && sudo apt-get install -y gcc libxml2 libpng-dev libmongoc-dev libzip4
 
-      # Install Mac native dependencies
-      - name: Install native dependencies
-        if: runner.os == 'MacOS'
-        run: |
-          brew install mongo-c-driver libpng libzip libtiff zlib
-          echo $(brew list)
+      # # Install Mac native dependencies
+      # - name: Install native dependencies
+      #   if: runner.os == 'MacOS'
+      #   run: |
+      #     brew install mongo-c-driver libpng libzip libtiff zlib
+      #     echo $(brew list)
 
       - name: Install build dependencies
         run: python -m pip install build twine
