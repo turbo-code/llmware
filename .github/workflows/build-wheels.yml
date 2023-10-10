@@ -29,8 +29,6 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           apt update && apt install -y gcc libxml2 libpng-dev libmongoc-dev libzip4
-          brewPackages = $(brew list)
-          echo "$brewPackages"
 
       # Install Mac native dependencies
       - name: Install native dependencies
