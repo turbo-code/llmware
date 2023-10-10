@@ -21,7 +21,7 @@ native_graph = Extension(
                   '/opt/homebrew/Cellar/mongo-c-driver/1.24.4/include/libmongoc-1.0',
                   '/usr/local/Cellar/mongo-c-driver/1.24.4/include/libbson-1.0',
                   '/usr/local/Cellar/mongo-c-driver/1.24.4/include/libmongoc-1.0',
-                  '/usr/include/libbson-1.0/',
+                  '/usr/include/libbson-1.0',
                   '/usr/include/libmongoc-1.0'],
     library_dirs=['/usr/local/lib']
 )
@@ -34,7 +34,7 @@ native_pdf = Extension(
                   '/opt/homebrew/Cellar/mongo-c-driver/1.24.4/include/libmongoc-1.0',
                   '/usr/local/Cellar/mongo-c-driver/1.24.4/include/libbson-1.0',
                   '/usr/local/Cellar/mongo-c-driver/1.24.4/include/libmongoc-1.0',
-                  '/usr/include/libbson-1.0/',
+                  '/usr/include/libbson-1.0',
                   '/usr/include/libmongoc-1.0'],
     library_dirs=['/usr/local/lib']
 )
@@ -47,7 +47,7 @@ native_office = Extension(
                   '/opt/homebrew/Cellar/mongo-c-driver/1.24.4/include/libmongoc-1.0',
                   '/usr/local/Cellar/mongo-c-driver/1.24.4/include/libbson-1.0',
                   '/usr/local/Cellar/mongo-c-driver/1.24.4/include/libmongoc-1.0',
-                  '/usr/include/libbson-1.0/',
+                  '/usr/include/libbson-1.0',
                   '/usr/include/libmongoc-1.0'],
     library_dirs=['/usr/local/lib']
 )
