@@ -4,25 +4,100 @@ name: Build Wheels
 
 on:
   workflow_dispatch:
-
+  
 jobs:
-  build_wheels:
-    name: Build wheels on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-20.04, macos-11]
-      
+  build_sdist:
+    name: Build sdist
+    runs-on: ubuntu-20.04
+    outputs:
+      SDIST_NAME: ${{ steps.sdist.outputs.SDIST_NAME }}
+  
     steps:
       # Checkout the native code
       - name: Checkout native code
-        uses: actions/checkout@v3
-    
-      # Setup Python 3.9
-      - name: Setup Python 3.9
-        uses: actions/setup-python@v3
+        uses: actions/checkout@v4
+  
+      - name: Install Python 3.9
+        uses: actions/setup-python@v4
         with:
           python-version: 3.9
+     
+          # Install Linux native dependencies
+      - name: Install native dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update && sudo apt-get install -y gcc libxml2 libpng-dev libmongoc-dev libzip4
+
+      # Install Mac native dependencies
+      - name: Install native dependencies
+        if: runner.os == 'MacOS'
+        run: |
+          brew install mongo-c-driver libpng libzip libtiff zlib
+          echo $(brew list)
+
+      - name: Install build dependencies
+        run: python -m pip install build twine
+
+      - name: Build sdist
+        id: sdist
+        run: |
+          python -m build --sdist
+          python ci/export_sdist_name.py
+  
+      - name: Upload sdist result
+        uses: actions/upload-artifact@v3
+        with:
+          name: sdist
+          path: dist/*.tar.gz
+          if-no-files-found: error
+  
+  build_wheels:
+    needs: build_sdist
+    name: Build wheels on ${{ matrix.os }} for ${{ matrix.cibw_archs }}
+    runs-on: ${{ matrix.os }}
+    env:
+      CIBW_BEFORE_BUILD: >-
+        rm -rf {package}/build
+      CIBW_BEFORE_BUILD_WINDOWS: >-
+        rm -rf {package}/build
+      CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: >-
+        delvewheel repair -w {dest_dir} {wheel}
+      CIBW_AFTER_BUILD: >-
+        twine check {wheel} 
+      CIBW_CONFIG_SETTINGS: setup-args="--vsenv"
+      CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
+      CIBW_SKIP: "*-musllinux_aarch64"
+      CIBW_TEST_COMMAND: >-
+        python {package}/ci/check_version_number.py
+      # Apple Silicon machines are not available for testing, so silence the
+      # warning from cibuildwheel. Remove the skip when they're available.
+      CIBW_TEST_SKIP: "*-macosx_arm64"
+      MACOSX_DEPLOYMENT_TARGET: "10.12"
+      MPL_DISABLE_FH4: "yes"
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-20.04
+            cibw_archs: "x86_64"
+          - os: ubuntu-20.04
+            cibw_archs: "aarch64"
+          # - os: windows-latest
+          #   cibw_archs: "auto64"
+          - os: macos-11
+            cibw_archs: "x86_64 arm64"
+  
+    steps:
+      - name: Set up QEMU
+        if: matrix.cibw_archs == 'aarch64'
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+  
+      - name: Download sdist
+        uses: actions/download-artifact@v3
+        with:
+          name: sdist
+          path: dist/
 
       # Install Linux native dependencies
       - name: Install native dependencies
@@ -36,94 +111,17 @@ jobs:
         run: |
           brew install mongo-c-driver libpng libzip libtiff zlib
           echo $(brew list)
-
-      - name: Install cibuildwheel
-        run: python -m pip install cibuildwheel==2.16.2
-
-      - name: Build wheels
-        run: python -m cibuildwheel --output-dir wheelhouse
-        # to supply options, put them in 'env', like:
-        # env:
-        #   CIBW_SOME_OPTION: value
-
-      - name: Upload artifcacts
-        uses: actions/upload-artifact@v3
+  
+      - name: Build wheels for CPython 3.9
+        uses: pypa/cibuildwheel@7da7df1efc530f07d1945c00934b8cfd34be0d50 # v2.16.1
         with:
+          package-dir: dist/${{ needs.build_sdist.outputs.SDIST_NAME }}
+        env:
+          CIBW_BUILD: "cp39-*"
+          CIBW_ARCHS: ${{ matrix.cibw_archs }}
+  
+      - uses: actions/upload-artifact@v3
+        with:
+          name: wheels
           path: ./wheelhouse/*.whl
-
-      #     # TODO remove the CIBW_BEFORE_BUILD_* lines once there are
-      #     #  numpy2.0 wheels available on PyPI. Also remove/comment out the
-      #     # PIP_NO_BUILD_ISOLATION and PIP_EXTRA_INDEX_URL from CIBW_ENVIRONMENT
-      #     # (also for _MACOS and _WINDOWS below)
-      #     CIBW_BEFORE_BUILD_LINUX: "pip install numpy>=2.0.0.dev0 meson-python cython pythran pybind11 ninja; bash {project}/tools/wheels/cibw_before_build_linux.sh {project}"
-      #     CIBW_BEFORE_BUILD_WINDOWS: "pip install numpy>=2.0.0.dev0 meson-python cython pythran pybind11 ninja && bash {project}/tools/wheels/cibw_before_build_win.sh {project}"
-      #     CIBW_BEFORE_BUILD_MACOS: "pip install numpy>=2.0.0.dev0 meson-python cython pythran pybind11 ninja; bash {project}/tools/wheels/cibw_before_build_macos.sh {project}"
-      #     # Allow pip to find install nightly wheels if necessary
-      #     # Setting PIP_NO_BUILD_ISOLATION=false makes pip use build-isolation.
-      #     CIBW_ENVIRONMENT: "PIP_NO_BUILD_ISOLATION=false PIP_PRE=1 PIP_EXTRA_INDEX_URL=https://pypi.anaconda.org/scientific-python-nightly-wheels/simple"
-
-      #     CIBW_ENVIRONMENT_WINDOWS: >
-      #       PKG_CONFIG_PATH=c:/opt/64/lib/pkgconfig
-      #       PIP_PRE=1
-      #       PIP_EXTRA_INDEX_URL=https://pypi.anaconda.org/scientific-python-nightly-wheels/simple
-      #       PIP_NO_BUILD_ISOLATION=false
-
-      #     # setting SDKROOT necessary when using the gfortran compiler
-      #     # installed in cibw_before_build_macos.sh
-      #     # MACOS_DEPLOYMENT_TARGET is set because of
-      #     # https://github.com/mesonbuild/meson-python/pull/309. Once
-      #     # an update is released, then that environment variable can
-      #     # be removed.
-      #     CIBW_ENVIRONMENT_MACOS: >
-      #       SDKROOT=/Applications/Xcode_11.7.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk
-      #       LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
-      #       MACOSX_DEPLOYMENT_TARGET=10.9
-      #       MACOS_DEPLOYMENT_TARGET=10.9
-      #       _PYTHON_HOST_PLATFORM=macosx-10.9-x86_64
-      #       PIP_PRE=1
-      #       PIP_EXTRA_INDEX_URL=https://pypi.anaconda.org/scientific-python-nightly-wheels/simple
-      #       PIP_NO_BUILD_ISOLATION=false
-
-      #     CIBW_REPAIR_WHEEL_COMMAND_MACOS: >
-      #       DYLD_LIBRARY_PATH=/usr/local/lib delocate-listdeps {wheel} &&
-      #       DYLD_LIBRARY_PATH=/usr/local/lib delocate-wheel --require-archs {delocate_archs} -w {dest_dir} {wheel}
-
-      # - uses: actions/upload-artifact@v3
-      #   with:
-      #     path: ./wheelhouse/*.whl
-      #     name: ${{ matrix.python[0] }}-${{ matrix.buildplat[1] }}
-
-      # - uses: conda-incubator/setup-miniconda@v2
-      #   with:
-      #     # for installation of anaconda-client, required for upload to
-      #     # anaconda.org
-      #     # default (and activated) environment name is test
-      #     # Note that this step is *after* specific pythons have been used to
-      #     # build and test the wheel
-      #     auto-update-conda: true
-      #     python-version: "3.10"
-
-      # - name: Upload wheels
-      #   if: success()
-      #   shell: bash -el {0}
-      #   # see https://github.com/marketplace/actions/setup-miniconda for why
-      #   # `-el {0}` is required.
-      #   env:
-      #     SCIPY_STAGING_UPLOAD_TOKEN: ${{ secrets.SCIPY_STAGING_UPLOAD_TOKEN }}
-      #     SCIPY_NIGHTLY_UPLOAD_TOKEN: ${{ secrets.SCIPY_NIGHTLY_UPLOAD_TOKEN }}
-      #   run: |
-      #     conda install -y anaconda-client
-      #     source tools/wheels/upload_wheels.sh
-      #     set_upload_vars
-      #     # For cron jobs (restricted to main branch) or "Run workflow" trigger
-      #     # an upload to:
-      #     #
-      #     # https://anaconda.org/scientific-python-nightly-wheels/scipy
-      #     # 
-      #     # Pushes to a maintenance branch that contain '[wheel build]' will
-      #     # cause wheels to be built and uploaded to:
-      #     #
-      #     # https://anaconda.org/multibuild-wheels-staging/scipy
-      #     #
-      #     # The tokens were originally generated at anaconda.org
-      #     upload_wheels
+          if-no-files-found: error
