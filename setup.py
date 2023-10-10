@@ -12,45 +12,45 @@ from setuptools import find_packages, setup, Extension
 #!/usr/bin/env python
 
 # Native extensions
-native_graph = Extension(
-    'llmware.graph',
-    sources=['src/graph_llmware.c'],
-    libraries=['mongoc-1.0', 'bson-1.0', 'xml2', 'png', 'zip'],
-    extra_compile_args=['-w'],
-    include_dirs=['/opt/homebrew/Cellar/mongo-c-driver/1.24.4/include/libbson-1.0',
-                  '/opt/homebrew/Cellar/mongo-c-driver/1.24.4/include/libmongoc-1.0',
-                  '/usr/local/Cellar/mongo-c-driver/1.24.4/include/libbson-1.0',
-                  '/usr/local/Cellar/mongo-c-driver/1.24.4/include/libmongoc-1.0',
-                  '/usr/include/libbson-1.0',
-                  '/usr/include/libmongoc-1.0'],
-    library_dirs=['/usr/local/lib']
-)
-native_pdf = Extension(
-    'llmware.pdf',
-    sources=['src/pdf_parser_llmware.c'],
-    libraries=['mongoc-1.0', 'bson-1.0', 'xml2', 'png', 'zip'],
-    extra_compile_args=['-w'],
-    include_dirs=['/opt/homebrew/Cellar/mongo-c-driver/1.24.4/include/libbson-1.0',
-                  '/opt/homebrew/Cellar/mongo-c-driver/1.24.4/include/libmongoc-1.0',
-                  '/usr/local/Cellar/mongo-c-driver/1.24.4/include/libbson-1.0',
-                  '/usr/local/Cellar/mongo-c-driver/1.24.4/include/libmongoc-1.0',
-                  '/usr/include/libbson-1.0',
-                  '/usr/include/libmongoc-1.0'],
-    library_dirs=['/usr/local/lib']
-)
-native_office = Extension(
-    'llmware.office',
-    sources=['src/office_llmware.c'],
-    libraries=['mongoc-1.0', 'bson-1.0', 'xml2', 'png', 'zip'],
-    extra_compile_args=['-w'],
-    include_dirs=['/opt/homebrew/Cellar/mongo-c-driver/1.24.4/include/libbson-1.0',
-                  '/opt/homebrew/Cellar/mongo-c-driver/1.24.4/include/libmongoc-1.0',
-                  '/usr/local/Cellar/mongo-c-driver/1.24.4/include/libbson-1.0',
-                  '/usr/local/Cellar/mongo-c-driver/1.24.4/include/libmongoc-1.0',
-                  '/usr/include/libbson-1.0',
-                  '/usr/include/libmongoc-1.0'],
-    library_dirs=['/usr/local/lib']
-)
+# native_graph = Extension(
+#     'llmware.graph',
+#     sources=['src/graph_llmware.c'],
+#     libraries=['mongoc-1.0', 'bson-1.0', 'xml2', 'png', 'zip'],
+#     extra_compile_args=['-w'],
+#     include_dirs=['/opt/homebrew/Cellar/mongo-c-driver/1.24.4/include/libbson-1.0',
+#                   '/opt/homebrew/Cellar/mongo-c-driver/1.24.4/include/libmongoc-1.0',
+#                   '/usr/local/Cellar/mongo-c-driver/1.24.4/include/libbson-1.0',
+#                   '/usr/local/Cellar/mongo-c-driver/1.24.4/include/libmongoc-1.0',
+#                   '/usr/include/libbson-1.0',
+#                   '/usr/include/libmongoc-1.0'],
+#     library_dirs=['/usr/local/lib']
+# )
+# native_pdf = Extension(
+#     'llmware.pdf',
+#     sources=['src/pdf_parser_llmware.c'],
+#     libraries=['mongoc-1.0', 'bson-1.0', 'xml2', 'png', 'zip'],
+#     extra_compile_args=['-w'],
+#     include_dirs=['/opt/homebrew/Cellar/mongo-c-driver/1.24.4/include/libbson-1.0',
+#                   '/opt/homebrew/Cellar/mongo-c-driver/1.24.4/include/libmongoc-1.0',
+#                   '/usr/local/Cellar/mongo-c-driver/1.24.4/include/libbson-1.0',
+#                   '/usr/local/Cellar/mongo-c-driver/1.24.4/include/libmongoc-1.0',
+#                   '/usr/include/libbson-1.0',
+#                   '/usr/include/libmongoc-1.0'],
+#     library_dirs=['/usr/local/lib']
+# )
+# native_office = Extension(
+#     'llmware.office',
+#     sources=['src/office_llmware.c'],
+#     libraries=['mongoc-1.0', 'bson-1.0', 'xml2', 'png', 'zip'],
+#     extra_compile_args=['-w'],
+#     include_dirs=['/opt/homebrew/Cellar/mongo-c-driver/1.24.4/include/libbson-1.0',
+#                   '/opt/homebrew/Cellar/mongo-c-driver/1.24.4/include/libmongoc-1.0',
+#                   '/usr/local/Cellar/mongo-c-driver/1.24.4/include/libbson-1.0',
+#                   '/usr/local/Cellar/mongo-c-driver/1.24.4/include/libmongoc-1.0',
+#                   '/usr/include/libbson-1.0',
+#                   '/usr/include/libmongoc-1.0'],
+#     library_dirs=['/usr/local/lib']
+# )
 
 
 # def custom_install_command():
@@ -127,10 +127,10 @@ setup(
     ],
     keywords="ai,data,development",  # Optional 
     packages=['llmware'],
-    package_data={'llmware': ['lib/**/**/*.so', 'lib/**/**/*.dylib']},
+    package_data={'llmware': ['llmware/*.so','llmware/*.dylib']},
     python_requires=">=3.9, <3.11",
     zip_safe=True,
-    ext_modules=[native_graph, native_pdf, native_office],
+    #ext_modules=[native_graph, native_pdf, native_office],
     # cmdclass={
     #     'install': CustomInstallCommand,
     #     'develop': CustomDevelopCommand,
