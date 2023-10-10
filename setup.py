@@ -14,21 +14,21 @@ from setuptools import find_packages, setup, Extension
 # Native extensions
 native_graph = Extension(
     'llmware.graph',
-    sources=['graph_llmware.c'],
+    sources=['src/graph_llmware.c'],
     libraries=['mongoc-1.0', 'bson-1.0', 'xml2', 'png', 'zip', 'poppler', 'tesseract'],
     include_dirs=['.','/opt/homebrew/Cellar/mongo-c-driver/1.24.4/include/libbson-1.0','/opt/homebrew/Cellar/mongo-c-driver/1.24.4/include/libmongoc-1.0'],
     library_dirs=['/usr/local/lib']
 )
 native_pdf = Extension(
     'llmware.pdf',
-    sources=['llmware-native/pdf_parser_llmware.c'],
+    sources=['src/pdf_parser_llmware.c'],
     libraries=['mongoc-1.0', 'bson-1.0', 'xml2', 'png', 'zip', 'poppler', 'tesseract'],
     include_dirs=['.','/opt/homebrew/Cellar/mongo-c-driver/1.24.4/include/libbson-1.0','/opt/homebrew/Cellar/mongo-c-driver/1.24.4/include/libmongoc-1.0'],
     library_dirs=['/usr/local/lib']
 )
 native_office = Extension(
     'llmware.office',
-    sources=['llmware-native/office_llmware.c'],
+    sources=['src/office_llmware.c'],
     libraries=['mongoc-1.0', 'bson-1.0', 'xml2', 'png', 'zip', 'poppler', 'tesseract'],
     include_dirs=['.','/opt/homebrew/Cellar/mongo-c-driver/1.24.4/include/libbson-1.0','/opt/homebrew/Cellar/mongo-c-driver/1.24.4/include/libmongoc-1.0'],
     library_dirs=['/usr/local/lib']
