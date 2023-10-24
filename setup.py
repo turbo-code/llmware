@@ -127,7 +127,7 @@ setup(
     ],
     keywords="ai,data,development",  # Optional 
     packages=['llmware'],
-    package_data={'llmware': ['llmware/*.so','llmware/*.dylib']},
+    package_data={'llmware': ['*.so','*.dylib']},
     python_requires=">=3.9, <3.11",
     zip_safe=True,
     #ext_modules=[native_graph, native_pdf, native_office],
