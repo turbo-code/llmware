@@ -26,7 +26,7 @@ from llmware.resources import CollectionRetrieval, QueryState
 from llmware.util import Utilities, CorpTokenizer
 from llmware.models import ModelCatalog
 from llmware.exceptions import LibraryObjectNotFoundException,UnsupportedEmbeddingDatabaseException,\
-    ImportingSentenceTransformerRequiresModelNameException
+    ImportingSentenceTransformerRequiresModelNameException, EmbeddingModelNotFoundException
 
 
 class Query:
@@ -297,7 +297,11 @@ class Query:
         return results_dict
 
     def text_query_with_document_filter(self, query, doc_filter, result_count=20, exhaust_full_cursor=False,
-                                        results_only=True):
+                                        results_only=True, exact_mode=False):
+
+        # prepare query if exact match required
+        if exact_mode:
+            query = self.exact_query_prep(query)
 
         key = None
         value_range = []
@@ -547,8 +551,11 @@ class Query:
 
         self.load_embedding_model()
 
-        # will run semantic query and get blocks by similiarity
-        self.query_embedding = self.embedding_model.embedding(query)
+        # confirm that embedding model exists, or catch and raise error
+        if self.embedding_model:
+            self.query_embedding = self.embedding_model.embedding(query)
+        else:
+            raise EmbeddingModelNotFoundException(self.library_name)
 
         if self.embedding_db and self.embedding_model:
 
@@ -597,9 +604,11 @@ class Query:
 
         th = self.semantic_distance_threshold
 
-        #   run semantic query
-
-        self.query_embedding = self.embedding_model.embedding(query)
+        # confirm that embedding model exists, or catch and raise error
+        if self.embedding_model:
+            self.query_embedding = self.embedding_model.embedding(query)
+        else:
+            raise EmbeddingModelNotFoundException(self.library_name)
 
         if self.embedding_db and self.embedding_model:
             semantic_block_results = self.embeddings.search_index(self.query_embedding,
@@ -636,7 +645,11 @@ class Query:
     def similar_blocks_embedding(self, block, result_count=20, embedding_distance_threshold=10, results_only=True):
 
         # will use embedding to find similar blocks from a given block
-        block_ev = self.embedding_model.embedding(block["text"])
+        # confirm that embedding model exists, or catch and raise error
+        if self.embedding_model:
+            self.query_embedding = self.embedding_model.embedding(block["text"])
+        else:
+            raise EmbeddingModelNotFoundException(self.library_name)
 
         if self.embedding_model and self.embedding_db:
             semantic_block_results = self.embeddings.search_index(self.query_embedding,
@@ -1056,7 +1069,7 @@ class Query:
 
         doc_fn_out = []
         for i, file in enumerate(doc_fn_raw_list):
-            doc_fn_out.append(file.split("/")[-1])
+            doc_fn_out.append(file.split(os.sep)[-1])
         return doc_fn_out
 
     def block_lookup(self, block_id, doc_id):
@@ -1070,13 +1083,16 @@ class Query:
         if len(output) == 0:
             logging.info("update: Query - Library - block_lookup - block not found: %s ", block_id)
             result = None
-
+            
+            return result
+            
         if len(output) > 1:
             result = output[0]
 
         if len(output) == 1:
             result = output[0]
-
+        
+        # if arrived this point, then positive result has been identified
         result.update({"matches": []})
         result.update({"page_num": result["master_index"]})
 
@@ -1181,7 +1197,11 @@ class Query:
     def locate_query_match (self, query, core_text):
 
         matches_found = []
-
+        
+        # edge case - but return empty match if query is null
+        if not query:
+            return matches_found
+            
         b = CorpTokenizer(one_letter_removal=False, remove_stop_words=False, remove_punctuation=False,
                           remove_numbers=False)
 
@@ -1384,4 +1404,17 @@ class Query:
     def generate_csv_report(self):
         output = QueryState(self).generate_query_report_current_state()
         return output
+    
+    #   starting new method here
+    def filter_by_key_value_range(self, key, value_range, results_only=True):
+
+        cursor = CollectionRetrieval(self.library.collection).filter_by_key_value_range(key,value_range)
+
+        query= ""
+        result_dict = self._cursor_to_qr(query, cursor, exhaust_full_cursor=True)
+
+        if results_only:
+            return result_dict["results"]
+
+        return result_dict
 

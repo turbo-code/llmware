@@ -1,12 +1,10 @@
 # llmware
 ![Static Badge](https://img.shields.io/badge/python-3.9_%7C_3.10-blue?color=blue)
 ![PyPI - Version](https://img.shields.io/pypi/v/llmware?color=blue)
-![PyPI - Downloads](https://img.shields.io/pypi/dw/llmware?color=blue)
 
+`llmware` is a unified, open, extensible framework for LLM-based application patterns including Retrieval Augmented Generation (RAG). This project provides a comprehensive set of tools that anyone can use – from beginner to the most sophisticated AI developer – to rapidly build industrial-grade enterprise LLM-based applications.  _Key differentiators include: source citation for Q & A scenarios, fact checking, and other guardrails for model hallucination_.
 
-`llmware` is a unified, open, extensible framework for LLM-based application patterns including Retrieval Augmented Generation (RAG). This project provides a comprehensive set of tools that anyone can use – from beginner to the most sophisticated AI developer – to rapidly build industrial-grade enterprise LLM-based applications. 
-
-With `llmware`, our goal is to contribute to and help catalize an open community around the new combination of open, extensible technologies being assembled to accomplish fact-based generative workflows.
+With `llmware`, our goal is to contribute to and help catalyze an open community around the new combination of open, extensible technologies being assembled to accomplish fact-based generative workflows.
 
 ## 🎯  Key features
 `llmware` is an integrated framework comprised of four major components:
@@ -46,7 +44,12 @@ With `llmware`, our goal is to contribute to and help catalize an open community
 * A complete set of text-chunking tools to separate information and associated metadata to a consistent block format.
 </details>
 
-Explore [additional llmware capabilities](https://github.com/llmware-ai/llmware/blob/main/examples/README.md)
+#### 📚 Explore [additional llmware capabilities](https://github.com/llmware-ai/llmware/blob/main/examples/README.md) and 🎬 Check out these videos on how to quickly get started with RAG:
+- [Fast Start to RAG with LLMWare Open Source Library](https://www.youtube.com/watch?v=0naqpH93eEU)
+- [Use Retrieval Augmented Generation (RAG) without a Database](https://www.youtube.com/watch?v=tAGz6yR14lw)
+- [Use small LLMs for RAG for Contract Analysis (feat. LLMWare)](https://www.youtube.com/watch?v=8aV5p3tErP0)
+- [RAG using CPU-based (No-GPU required) Hugging Face Models with LLMWare on your laptop](https://www.youtube.com/watch?v=JjgqOZ2v5oU)
+
 ## 🌱 Getting Started
 
 ### 1. Install llmware:
@@ -144,9 +147,10 @@ end_to_end_rag()
  > Generating CSV report...
 File: /Users/llmware/llmware_data/prompt_history/interaction_report_Fri Sep 29 12:07:42 2023.csv
 ```
-#### See additional [llmware examples](https://github.com/llmware-ai/llmware/blob/main/examples/README.md) for more code samples and ideas.
+#### 📚 See 20+ [llmware examples](https://github.com/llmware-ai/llmware/blob/main/examples/README.md) for more RAG examples and other code samples and ideas.
 
-### 4. Accessing LLM's and setting-up API keys & secrets
+
+### 4. Accessing LLMs and setting-up API keys & secrets
 To get started with a proprietary model, you need to provide your own API Keys.  If you don't yet have one, more information can be found at: [AI21](https://docs.ai21.com/docs/quickstart), [Ai Bloks](https://www.aibloks.com/contact-us), [Anthropic](https://docs.anthropic.com/claude/reference/getting-started-with-the-api),  [Cohere](https://cohere.com/), [Google](https://cloud.google.com/vertex-ai/docs/generative-ai/start/quickstarts/api-quickstart), [OpenAI](https://help.openai.com/en/collections/3675940-getting-started-with-openai-api).
 
 API keys and secrets for models, aws, and pinecone can be set-up for use in environment variables or managed however you prefer. 
@@ -195,6 +199,16 @@ docker compose up
 <summary><b>📖  C. Install MongoDB natively </b></summary>
   
 See the [Official MongoDB Installation Guide](https://www.mongodb.com/docs/manual/installation/)
+
+</details>
+
+<details>
+<summary><b>🔗  D. Connect to an existing MongoDB deployment </b></summary>
+  
+You can connect to an existing MongoDB deployment by setting the connection string to the environment variable, ```COLLECTION_DB_URI```.  See the example script, [Using Mongo Atlas](https://github.com/llmware-ai/llmware/blob/main/examples/using_mongo_atlas.py), for detailed information on how to use Mongo Atlas as the NoSQL and/or Vector Database for `llmware`.  
+
+Additional information on finding and formatting connection strings can be found in the [MongoDB Connection Strings Documentation](https://www.mongodb.com/docs/manual/reference/connection-string/).
+
 
 </details>
 
@@ -251,22 +265,55 @@ Information on ways to participate can be found in our [Contributors Guide](http
 - Milvus
 - FAISS
 - Pinecone
+- MongoDB Atlas Vector Search
 
 **Prereqs:**  
 - All Platforms: [python v3.9 - 3.10](https://www.python.org/about/gettingstarted/)
 - Mac: [Homebrew](https://docs.brew.sh/Installation) is used to install the native dependencies
 - Linux: 
-  1. The pip package attempts to install the native dependencies. If it is run without root permission or a package manager other than Apt is used, you will need to manually install the following native packages: ```apt install -y libxml2 libpng-dev libmongoc-dev libzip4 tesseract-ocr poppler-utils```
-  2. The llmware parsers optimize for speed by using large stack frames. If you receive a "Segmentation Fault" during a parsing operation, update the system's 'stack size' resource limit: ```ulimit -s 32768000```
+  1. The pip package attempts to install the native dependencies. If it is run without root permission or a package manager other than Apt is used, you will need to manually install the following native packages: ```apt install -y libxml2 libpng-dev libmongoc-dev libzip4 tesseract-ocr poppler-utils```   *Note:  libmongoc-dev <= v1.24.4 is required.
+  2. The llmware parsers optimize for speed by using large stack frames. If you receive a "Segmentation Fault" during a parsing operation, update the system's 'stack size' resource limit: ```ulimit -s 32768000```.  If running llmware in a container then the ulimit needs to be set by the host with a command like the following: ```docker run --ulimit stack=32768000:32768000 ...```
   
 
 **Optional:**
 - [Docker](https://docs.docker.com/get-docker/) 
 
-<details>
-  <summary><b>Change Log</b></summary>
+**Known issues:**
+- A segmentation fault can occur when parsing if the native package for mongo-c-driver is 1.25 or above.  To address this issue, install llmware v0.1.6 and above or downgrade mongo-c-driver to v1.24.4.  
 
-- **Oct 2, 2023:**  🔥 Initial release of llmware to open source!! 🔥
+<details>
+  <summary><b>🚧 Change Log</b></summary>
+
+  
+- **03 Nov 2023: llmware v0.1.6**
+  - Updated packaging to require mongo-c-driver 1.24.4 to temporarily workaround segmentation fault with mongo-c-driver 1.25.
+  - Updates in python code needed in anticipation of future Windows support.  
+
+- **27 Oct 2023: llmware v0.1.5**
+  - Four new example scripts focused on RAG workflows with small, fine-tuned instruct models that run on a laptop (`llmware` [BLING](https://huggingface.co/llmware) models).
+  - Expanded options for setting temperature inside a prompt class.
+  - Improvement in post processing of Hugging Face model generation.
+  - Streamlined loading of Hugging Face generative models into prompts.
+  - Initial delivery of a central status class: read/write of embedding status with a consistent interface for callers.
+  - Enhanced in-memory dictionary search support for multi-key queries.
+  - Removed trailing space in human-bot wrapping to improve generation quality in some fine-tuned models.
+  - Minor defect fixes, updated test scripts, and version update for Werkzeug to address [dependency security alert](https://github.com/llmware-ai/llmware/security/dependabot/2).
+- **20 Oct 2023: llmware v0.1.4**
+  - GPU support for Hugging Face models.
+  - Defect fixes and additional test scripts.
+- **13 Oct 2023: llmware v0.1.3**
+  - MongoDB Atlas Vector Search support.
+  - Support for authentication using a MongoDB connection string.
+  - Document summarization methods.
+  - Improvements in capturing the model context window automatically and passing changes in the expected output length.  
+  - Dataset card and description with lookup by name.
+  - Processing time added to model inference usage dictionary.
+  - Additional test scripts, examples, and defect fixes.
+- **06 Oct 2023: llmware v0.1.1**
+  - Added test scripts to the github repository for regression testing.
+  - Minor defect fixes and version update of Pillow to address [dependency security alert](https://github.com/llmware-ai/llmware/security/dependabot/1).
+- **02 Oct 2023: llmware v0.1.0**  🔥 Initial release of llmware to open source!! 🔥
+
 
 </details>
 

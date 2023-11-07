@@ -108,13 +108,13 @@ class Library:
         self.library_main_path = os.path.join(LLMWareConfig.get_library_path(), account_name, library_name)
 
         # add new file dir for this collection
-        self.file_copy_path = os.path.join(self.library_main_path,"uploads/")
-        self.image_path = os.path.join(self.library_main_path, "images/")
-        self.dataset_path = os.path.join(self.library_main_path, "datasets/")
-        self.nlp_path = os.path.join(self.library_main_path, "nlp/")
-        self.output_path = os.path.join(self.library_main_path, "output/")
-        self.tmp_path = os.path.join(self.library_main_path, "tmp/")
-        self.embedding_path = os.path.join(self.library_main_path, "embedding/")
+        self.file_copy_path = os.path.join(self.library_main_path,"uploads" + os.sep )
+        self.image_path = os.path.join(self.library_main_path, "images" + os.sep)
+        self.dataset_path = os.path.join(self.library_main_path, "datasets" + os.sep)
+        self.nlp_path = os.path.join(self.library_main_path, "nlp" + os.sep)
+        self.output_path = os.path.join(self.library_main_path, "output" + os.sep)
+        self.tmp_path = os.path.join(self.library_main_path, "tmp" + os.sep)
+        self.embedding_path = os.path.join(self.library_main_path, "embedding" + os.sep)
 
         library_folder = os.path.exists(self.library_main_path)
 
@@ -145,7 +145,11 @@ class Library:
                              "knowledge_graph": "no",
 
                              # doc trackers
-                             "unique_doc_id": 0, "documents": 0, "blocks": 0, "images": 0, "pages": 0, "tables": 0}
+                             "unique_doc_id": 0, "documents": 0, "blocks": 0, "images": 0, "pages": 0, "tables": 0,
+
+                             # *** NEW ***
+                             "account_name": self.account_name
+                             }
 
         # LibraryCatalog will register the new library card
         new_library_card = LibraryCatalog(self).create_new_library_card(new_library_entry)
@@ -153,13 +157,17 @@ class Library:
         # assumes DB Connection for saving .collection
         self.collection = LibraryCollection(self).create_library_collection()
 
+        # *** change *** - update collection text index in collection after adding documents
+        LibraryCollection(self).create_index()
+
         return self
 
     def load_library(self, library_name, account_name="llmware"):
 
         # first check that library exists
-
-        library_exists = self.check_if_library_exists(library_name)
+        # *** INSERT CHANGE HERE - need to pass account name ***
+        library_exists = self.check_if_library_exists(library_name, account_name=account_name)
+        # *** END - CHANGE ***
 
         if not library_exists:
             logging.error("error: library/account not found - %s - %s ", library_name, account_name)
@@ -170,13 +178,13 @@ class Library:
         self.library_main_path = os.path.join(LLMWareConfig.get_library_path(), account_name, library_name)
 
         # add new file dir for this collection
-        self.file_copy_path = os.path.join(self.library_main_path, "uploads/")
-        self.image_path = os.path.join(self.library_main_path, "images/")
-        self.dataset_path = os.path.join(self.library_main_path, "datasets/")
-        self.nlp_path = os.path.join(self.library_main_path, "nlp/")
-        self.output_path = os.path.join(self.library_main_path, "output/")
-        self.tmp_path = os.path.join(self.library_main_path, "tmp/")
-        self.embedding_path = os.path.join(self.library_main_path, "embedding/")
+        self.file_copy_path = os.path.join(self.library_main_path, "uploads" + os.sep)
+        self.image_path = os.path.join(self.library_main_path, "images" + os.sep)
+        self.dataset_path = os.path.join(self.library_main_path, "datasets" + os.sep)
+        self.nlp_path = os.path.join(self.library_main_path, "nlp" + os.sep)
+        self.output_path = os.path.join(self.library_main_path, "output" + os.sep)
+        self.tmp_path = os.path.join(self.library_main_path, "tmp" + os.sep)
+        self.embedding_path = os.path.join(self.library_main_path, "embedding" + os.sep)
         os.makedirs(self.library_main_path, exist_ok=True)
         os.makedirs(self.file_copy_path,exist_ok=True)
         os.makedirs(self.image_path,exist_ok=True)
@@ -185,20 +193,35 @@ class Library:
         os.makedirs(self.output_path,exist_ok=True)
         os.makedirs(self.tmp_path,exist_ok=True)
         os.makedirs(self.embedding_path,exist_ok=True)
+
         # assumes DB Connection for saving collection
         self.collection = LibraryCollection(self).create_library_collection()
+
+        # *** change *** - update collection text index in collection after adding documents
+        LibraryCollection(self).create_index()
 
         return self
 
     def get_library_card(self, library_name=None, account_name="llmware"):
 
+        # *** INSERT CHANGE HERE - better handling of optional parameters ***
+
+        library_card = None
+
         if library_name:
-            self.library_name = library_name
+            lib_lookup_name = library_name
+            acct_lookup_name = account_name
+        else:
+            lib_lookup_name = self.library_name
+            acct_lookup_name = self.account_name
 
-        if account_name:
-            self.account_name = account_name
+        # if library_name: self.library_name = library_name
+        # if account_name: self.account_name = account_name
 
-        library_card= LibraryCatalog().get_library_card(self.library_name, account_name=account_name)
+        if lib_lookup_name and acct_lookup_name:
+            library_card= LibraryCatalog().get_library_card(lib_lookup_name, account_name=acct_lookup_name)
+
+        # *** END - INSERT CHANGE ***
 
         if not library_card:
             logging.warning("warning:  error retrieving library card - not found - %s - %s ", library_name, account_name)
@@ -378,7 +401,7 @@ class Library:
 
         results = CollectionRetrieval(self.collection).filter_by_key_value_range("content_type",filter_list)
 
-        file_location = os.path.join(output_fp + "/", output_fn + ".txt")
+        file_location = os.path.join(output_fp, output_fn + ".txt")
         output_file = open(file_location, "w")
         text_field = "text_search"
         for elements in results:

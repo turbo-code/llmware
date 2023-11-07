@@ -49,12 +49,9 @@ class DBManager:
         def __init__(self):
 
             self.collection_db_path = LLMWareConfig.get_config("collection_db_uri")
-            username = LLMWareConfig.get_config("collection_db_username")
-            password = LLMWareConfig.get_config("collection_db_password")
 
             # default client is Mongo currently
-            self.client = MongoClient(self.collection_db_path, username=username, password=password,
-                                      unicode_decode_error_handler='ignore')
+            self.client = MongoClient(self.collection_db_path, unicode_decode_error_handler='ignore')
             #self.client.admin.authenticate(username, password)
 
     __instance = None
@@ -70,12 +67,10 @@ class DBManager:
 
 def check_db_uri(timeout_secs=5):
 
-    username = LLMWareConfig.get_config("collection_db_username")
-    password = LLMWareConfig.get_config("collection_db_password")
     uri_string = LLMWareConfig.get_config("collection_db_uri")
 
     # default client is Mongo currently
-    client = MongoClient(uri_string, username=username, password=password,unicode_decode_error_handler='ignore')
+    client = MongoClient(uri_string, unicode_decode_error_handler='ignore')
 
     # self.client.admin.authenticate(username, password)
 
@@ -351,7 +346,7 @@ class CloudBucketManager:
 
         for file in files:
 
-            name_parts = file.key.split("/")
+            name_parts = file.key.split(os.sep)
 
             # confirm that file.key is correctly structure as [0] model name, and [1] model component
             if len(name_parts) == 2:
@@ -408,8 +403,8 @@ class CloudBucketManager:
 
                 #   simple model_repo structure - each model is a separate folder
                 #   each model is a 'flat list' of files, so safe to split on ("/") to get key name
-                if not file.key.endswith("/"):
-                    local_file_path = os.path.join(local_model_folder,file.key.split("/")[-1])
+                if not file.key.endswith(os.sep):
+                    local_file_path = os.path.join(local_model_folder,file.key.split(os.sep)[-1])
                     bucket.download_file(file.key, local_file_path)
 
         logging.info("update: successfully downloaded model - %s -  from aws s3 bucket for future access",
