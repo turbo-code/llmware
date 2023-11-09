@@ -17,8 +17,6 @@ if platform.system() == 'macOS':  # or 'Windows', 'Darwin' for macOS, etc.
 else:
     extensions = []
 
-
-
 VERSION_FILE = "llmware/__init__.py"
 with open(VERSION_FILE) as version_file:
     match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",version_file.read(), re.MULTILINE)
