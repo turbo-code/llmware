@@ -6,11 +6,18 @@ import re
 import sys
 from setuptools import find_packages, setup, Extension
 
-# We need at least one extension so that cibuildwheel considers this to be a platform-specific wheel
 dummy_extension = Extension(
      'hello',
      sources=['llmware/hello.c']
 )
+
+# We need at least one extension so that cibuildwheel considers this to be a platform-specific wheel
+if platform.system() == 'macOS':  # or 'Windows', 'Darwin' for macOS, etc.
+    extensions = [dummy_extension]
+else:
+    extensions = []
+
+
 
 VERSION_FILE = "llmware/__init__.py"
 with open(VERSION_FILE) as version_file:
@@ -49,7 +56,7 @@ setup(
     package_data={'llmware': ['*.so', '*.dylib']},
     python_requires=">=3.9, <3.11",
     zip_safe=True,
-    ext_modules=[dummy_extension],
+    ext_modules=extensions,
     install_requires=[
         'ai21>=1.0.3',
         'anthropic>=0.3.11',
