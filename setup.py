@@ -6,13 +6,6 @@ import re
 import sys
 from setuptools import find_packages, setup, Extension
 
-# dummy_extension = Extension(
-#      'hello',
-#      sources=['llmware/hello.c']
-# )
-
-# extensions = [dummy_extension] # [dummy_extension]
-
 VERSION_FILE = "llmware/__init__.py"
 with open(VERSION_FILE) as version_file:
     match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",version_file.read(), re.MULTILINE)
@@ -50,7 +43,6 @@ setup(
     package_data={'llmware': ['*.c', '*.so', '*.dylib']},
     python_requires=">=3.9, <3.11",
     zip_safe=True,
-    #ext_modules=extensions,
     install_requires=[
         'ai21>=1.0.3',
         'anthropic>=0.3.11',
