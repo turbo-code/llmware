@@ -11,7 +11,7 @@ dummy_extension = Extension(
      sources=['llmware/hello.c']
 )
 
-extensions = [dummy_extension]
+extensions = [] # [dummy_extension]
 
 VERSION_FILE = "llmware/__init__.py"
 with open(VERSION_FILE) as version_file:
