@@ -47,7 +47,7 @@ setup(
     ],
     keywords="ai,data,development",  # Optional 
     packages=['llmware'],
-    package_data={'llmware': ['*.so', '*.dylib']},
+    package_data={'llmware': ['*.c', '*.so', '*.dylib']},
     python_requires=">=3.9, <3.11",
     zip_safe=True,
     ext_modules=extensions,
