@@ -1895,7 +1895,7 @@ if system == 'linux' and machine not in ['aarch64','x86_64']:
 machine_dependent_lib_path = os.path.join(LLMWareConfig.get_config("shared_lib_path"), system, machine)
 
 #_path_graph  = os.path.join(machine_dependent_lib_path, "libgraph_llmware."   + file_ext[system])
-_path_graph  = os.path.join(os.path.dirname(__file__), "graph_parser_llmware.so")
+_path_graph  = os.path.join(os.path.dirname(__file__), "graph_llmware.so")
 
 _mod_utility = cdll.LoadLibrary(_path_graph)
 

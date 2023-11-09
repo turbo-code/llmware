@@ -59,7 +59,7 @@ if system == 'linux' and machine not in ['aarch64','x86_64']:
 
 _path_office = os.path.join(os.path.dirname(__file__), "office_parser_llmware.so")
 _path_pdf    = os.path.join(os.path.dirname(__file__), "pdf_parser_llmware.so")
-_path_graph  = os.path.join(os.path.dirname(__file__), "graph_parser_llmware.so")
+_path_graph  = os.path.join(os.path.dirname(__file__), "graph_llmware.so")
 
 _mod = cdll.LoadLibrary(_path_office)
 _mod_pdf = cdll.LoadLibrary(_path_pdf)
