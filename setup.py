@@ -11,11 +11,7 @@ dummy_extension = Extension(
      sources=['llmware/hello.c']
 )
 
-# We need at least one extension so that cibuildwheel considers this to be a platform-specific wheel
-if platform.system() == 'macOS':  # or 'Windows', 'Darwin' for macOS, etc.
-    extensions = [dummy_extension]
-else:
-    extensions = []
+extensions = [dummy_extension]
 
 VERSION_FILE = "llmware/__init__.py"
 with open(VERSION_FILE) as version_file:
